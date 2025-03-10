@@ -3,9 +3,14 @@ The HDB Resale Price Visualizer is a web-based application designed for HDB resa
 
 Directory
 .
-├── deliverables         
-├── frontend            
-├── backend             
+├── deliverables 
+
+├── frontend  
+
+├── backend  
+
 ├── data_visualization
+
 ├── .gitignore
+
 └── README.md
