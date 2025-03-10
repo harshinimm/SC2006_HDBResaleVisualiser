@@ -5,13 +5,18 @@ Directory
 .
 
 ├── deliverables 
-|
+
+
 ├── frontend  
-|
+
+
 ├── backend  
-|
+
+
 ├── data_visualization
-|
+
+
 ├── .gitignore
-|
+
+
 └── README.md
