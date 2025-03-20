@@ -1,5 +1,9 @@
 import React from "react";
+<<<<<<< HEAD
 import MapComponent from "../MapComponent"; // Import Google Maps component
+=======
+import MapComponent from "../utils/MapComponent"; // Import Google Maps component
+>>>>>>> a775301a (Updated frontend with latest changes)
 
 function GoogleMapPage() {
   return (

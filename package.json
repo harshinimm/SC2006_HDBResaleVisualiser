@@ -3,12 +3,23 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+<<<<<<< HEAD
     "@react-google-maps/api": "^2.20.6",
+=======
+>>>>>>> a775301a (Updated frontend with latest changes)
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^13.5.0",
+<<<<<<< HEAD
     "react": "^19.0.0",
+=======
+    "axios": "^1.7.9",
+    "chart.js": "^4.4.8",
+    "nodemailer": "^6.10.0",
+    "react": "^19.0.0",
+    "react-chartjs-2": "^5.3.0",
+>>>>>>> a775301a (Updated frontend with latest changes)
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.5",
     "react-scripts": "5.0.1",
