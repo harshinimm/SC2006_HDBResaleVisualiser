@@ -13,16 +13,24 @@ df['year'] = df['month'].dt.year
 towns = df['town'].unique().tolist()
 print("Available towns for comparison:")
 print(", ".join(towns))
-user_input = input("Enter the towns to compare, separated by a comma: ")
-user_towns = [town.strip().upper() for town in user_input.split(',')]
-valid_towns = [town for town in user_towns if town in towns]
-if not valid_towns:
-    print("Invalid input. Please enter valid towns from the list provided.")
-    exit()
-df_filtered = df[df['town'].isin(valid_towns)]
 
 while True:
-    print("Select the data you want to analyze:")
+    user_input = input("Enter the towns to compare, separated by a comma: ")
+    user_towns = [town.strip().upper() for town in user_input.split(',')]
+    valid_towns = [town for town in user_towns if town in towns]
+    
+    if valid_towns:
+        break
+    else:
+        print("Invalid input. Please enter valid towns from the list provided.")
+
+df_filtered = df[df['town'].isin(valid_towns)]
+
+print("\nFiltered Data Preview:")
+print(df_filtered.head())
+
+while True:
+    print("\nSelect the data you want to analyze:")
     print("1: Average Price Trends")
     print("2: Most Expensive and Cheapest Year")
     print("3: Price Volatility")
@@ -72,3 +80,4 @@ while True:
         break
     else:
         print("Invalid option selected.")
+```
