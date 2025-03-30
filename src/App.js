@@ -1,58 +1,36 @@
-<<<<<<< HEAD
-=======
 import React from "react";
->>>>>>> a775301a (Updated frontend with latest changes)
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+// Existing components
 import HomePage from "./homepage/HomePage";
 import ForgotPassword from "./login/ForgotPassword";
 import Signup from "./login/Signup";
-<<<<<<< HEAD
-import MapSelection from "./pages/MapSelection"; // ✅ Import selection screen
-import GoogleMapPage from "./pages/GoogleMapPage"; // ✅ Import Google Map Page
 
+// New components you want to add
+import MapSelection from "./pages/MapSelection"; // ✅ New Selection Screen
+import GoogleMapPage from "./pages/GoogleMapPage"; // ✅ New Google Map Page
+import HDBResaleVisualizer from "./pages/HDBResaleVisualizer"; // ✅ Add HDB Resale Visualizer
+
+// Functionality remains the same as the original
 function App() {
   return (
     <Router>
       <Routes>
+        {/* Existing Routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/signup" element={<Signup />} />
+
+        {/* Your New Routes Added Below */}
         <Route path="/map-selection" element={<MapSelection />} /> {/* ✅ New Selection Page */}
-        <Route path="/map" element={<GoogleMapPage />} />
+        <Route path="/map" element={<GoogleMapPage />} /> {/* ✅ New Google Map Page */}
+        
+        {/* New HDB Resale Visualizer Route */}
+        <Route path="/hdb-resale-visualizer" element={<HDBResaleVisualizer />} />
       </Routes>
     </Router>
   );
-=======
-import ResetPassword from "./login/ResetPassword";
-import Profile from "./pages/Profile";
-import MapSelection from "./pages/MapSelection";
-import SelectionMode from "./pages/SelectionMode";
-import GoogleMapPage from "./pages/GoogleMapPage";
-import PriceComparison from "./pages/PriceComparison";
-import SearchResults from "./pages/SearchResults";
-import Insights from "./pages/Insights";
-import RecentComparisons from "./homepage/RecentComparisons";
-
-function App() {
-    return (
-        <Router>
-            <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/reset-password/:token" element={<ResetPassword />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/map-selection" element={<MapSelection />} />
-                <Route path="/selection-mode" element={<SelectionMode />} />  
-                <Route path="/map" element={<GoogleMapPage />} />
-                <Route path="/compare-results" element={<PriceComparison />} />
-                <Route path="/search-results" element={<SearchResults />} />
-                <Route path="/insights" element={<Insights />} />
-                <Route path="/price-comparison" element={<PriceComparison />} />
-            </Routes>
-        </Router>
-    );
->>>>>>> a775301a (Updated frontend with latest changes)
 }
 
 export default App;
+
