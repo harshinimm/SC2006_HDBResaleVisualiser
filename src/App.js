@@ -7,9 +7,9 @@ import ForgotPassword from "./login/ForgotPassword";
 import Signup from "./login/Signup";
 
 
-import MapSelection from "./pages/MapSelection"; // ✅ New Selection Screen
-import GoogleMapPage from "./pages/GoogleMapPage"; // ✅ New Google Map Page
-import HDBResaleVisualizer from "./pages/HDBResaleVisualizer"; // ✅ Add HDB Resale Visualizer
+import MapSelection from "./pages/MapSelection"; 
+import GoogleMapPage from "./pages/GoogleMapPage"; 
+import HDBResaleVisualizer from "./pages/HDBResaleVisualizer"; 
 
 
 function App() {
