@@ -11,7 +11,7 @@ import PriceComparison from "./pages/PriceComparison";
 import SearchResults from "./pages/SearchResults";
 import Insights from "./pages/Insights";
 import RecentComparisons from "./homepage/RecentComparisons";
-import HDBResaleVisualizer from "./pages/HDBResaleVisualizer"; // ✅ Import the new component
+import HDBResaleVisualizer from "./pages/HDBResaleVisualizer"; 
 
 function App() {
     return (
@@ -28,7 +28,7 @@ function App() {
                 <Route path="/search-results" element={<SearchResults />} />
                 <Route path="/insights" element={<Insights />} />
                 <Route path="/price-comparison" element={<PriceComparison />} />
-                <Route path="/hdb-visualizer" element={<HDBResaleVisualizer />} /> {/* ✅ Added new route */}
+                <Route path="/hdb-visualizer" element={<HDBResaleVisualizer />} /> 
             </Routes>
         </Router>
     );
