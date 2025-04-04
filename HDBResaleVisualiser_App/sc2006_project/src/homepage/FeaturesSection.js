@@ -15,7 +15,7 @@ export default function FeaturesSection() {
 
       <div 
         className="p-6 bg-gray-100 rounded-lg shadow-md cursor-pointer hover:bg-gray-200 transition-all"
-        onClick={() => navigate("/map")}
+        onClick={() => navigate("/selection-mode")}
       >
         <h3 className="text-2xl font-bold">🗺 Interactive Map</h3>
         <p className="text-red-700 mt-2">Explore price heatmaps across Singapore.</p>

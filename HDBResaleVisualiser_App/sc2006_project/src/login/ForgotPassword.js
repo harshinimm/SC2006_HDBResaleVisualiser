@@ -1,37 +1,38 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate
 
 export default function ForgotPassword() {
     const [email, setEmail] = useState("");
-    const [message, setMessage] = useState(""); 
-    const navigate = useNavigate();
+    const [message, setMessage] = useState(""); // For displaying success/error messages
+    const navigate = useNavigate(); // ✅ Initialize navigate
 
-    // ✅ Email format validation function
-    const isValidEmail = (email) => {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    };
+    const handleSubmit = async (e) => {
+        e.preventDefault(); // Prevent the form from refreshing the page
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        
-        if (!email) {
-            setMessage("Please enter an email.");
-            return;
+        const apiUrl = "http://127.0.0.1:8000/api/account/forgot-password/"; // Local development URL
+
+        try {
+            const response = await fetch(apiUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email }), // Send the email to the backend
+            });
+
+            const data = await response.json(); // Parse the JSON response from the backend
+
+            if (response.ok) {
+                setMessage("Link sent to your email to reset password."); // ✅ Keep the success message
+                setEmail(""); // ✅ Clear the email input only
+            } else {
+                const errorMessages = Object.values(data).flat().join(", ");
+                setMessage(errorMessages || "An error occurred. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error during fetch:", error);
+            setMessage("An error occurred while processing your request. Please try again later.");
         }
-
-        if (!isValidEmail(email)) {
-            setMessage("Invalid email format. Please enter a valid email.");
-            return;
-        }
-
-        // ✅ Simulate successful request (Frontend-only)
-        setMessage("Check your email for reset instructions!");
-        
-        // Disable input after submission
-        setTimeout(() => {
-            setMessage("");
-            setEmail("");
-        }, 3000);
     };
 
     return (
@@ -39,8 +40,13 @@ export default function ForgotPassword() {
             <div className="bg-white p-8 rounded shadow-md w-96">
                 <h2 className="text-2xl font-semibold mb-4 text-center">Forgot Your Password?</h2>
                 
+                {/* ✅ Show success/error message */}
                 {message && (
-                    <div className={`mb-4 p-3 rounded ${message.includes("Check your email") ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                    <div
+                        className={`mb-4 p-3 rounded ${
+                            message.includes("Link sent") ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                        }`}
+                    >
                         {message}
                     </div>
                 )}
@@ -61,6 +67,7 @@ export default function ForgotPassword() {
                         />
                     </div>
                     
+                    {/* ✅ Button Row: Reset Password & Homepage */}
                     <div className="flex justify-between items-center">
                         <button
                             className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"

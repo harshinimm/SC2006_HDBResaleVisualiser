@@ -1,10 +1,11 @@
 import React from "react";
-import MapComponent from "../utils/MapComponent"; // Import Google Maps component
+import Navbar from "../homepage/Navbar";
+import MapComponent from "../utils/MapComponent";
 
 function GoogleMapPage() {
   return (
-    <div>
-      <h1 className="text-center text-2xl font-bold">HDB Resale Price - Interactive Map</h1>
+    <div className="min-h-screen bg-white text-red-900">
+      <Navbar />
       <MapComponent />
     </div>
   );

@@ -14,13 +14,13 @@ export default function Profile() {
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
-                const response = await axiosInstance.get("user-profile/");
+                const response = await axiosInstance.get("account/user-profile/"); // ✅ Updated URL
                 setUserData(response.data);
                 setNewValues({ username: response.data.username, email: response.data.email, password: "" });
             } catch (error) {
                 console.error("Error fetching user profile:", error);
                 setError("You must be logged in to view this page.");
-                setTimeout(() => navigate("/login"), 2000);
+                setTimeout(() => navigate("/login"), 2000); // Redirect to login if not logged in
             }
         };
 
@@ -37,7 +37,7 @@ export default function Profile() {
         setIsResettingPassword(true); // Show loading state
 
         try {
-           await axiosInstance.post("forgot-password/", { email: userData.email });
+            await axiosInstance.post("account/forgot-password/", { email: userData.email }); // ✅ Updated URL
 
             setResetMessage("Password reset instructions sent to your email.");
         } catch (error) {
@@ -61,7 +61,7 @@ export default function Profile() {
         }
 
         try {
-            const response = await axiosInstance.put("update-profile/", {
+            const response = await axiosInstance.put("account/update-profile/", { // ✅ Updated URL
                 username: newValues.username,
                 email: newValues.email,
                 password: newValues.password,

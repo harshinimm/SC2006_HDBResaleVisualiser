@@ -1,91 +1,89 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext"; // 👈 Use global auth context
 
-export default function LoginModal({ isLoginOpen, setIsLoginOpen, setIsLoggedIn, setUsername }) {
-    const [username, setUsernameInput] = useState("");
-    const [password, setPassword] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");
-    const navigate = useNavigate();
+export default function LoginModal() {
+  const navigate = useNavigate();
+  const { isLoginOpen, setIsLoginOpen, handleLogin } = useContext(AuthContext); // 👈 Use context
 
-    const handleLogin = () => {
-        if (!username || !password) {
-            setErrorMessage("Please enter both username and password.");
-            return;
-        }
+  const [username, setUsernameInput] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-        // ✅ Simulating a successful login (Fake Auth)
-        if (password === "test123") {
-            localStorage.setItem("isLoggedIn", "true");
-            localStorage.setItem("username", username);
-            setIsLoggedIn(true);
-            setUsername(username);
-            setIsLoginOpen(false);
-            navigate("/");
-        } else {
-            setErrorMessage("Invalid username or password.");
-        }
-    };
+  // ✅ Internal handler to validate inputs before calling context login
+  const handleLoginClick = async () => {
+    if (!username || !password) {
+      setErrorMessage("Please enter both username and password.");
+      return;
+    }
 
-    if (!isLoginOpen) return null;
+    try {
+      await handleLogin(username, password); // 👈 Use context handler
+      setIsLoginOpen(false); // Close modal on success
+      navigate("/"); // Redirect to homepage
+    } catch (err) {
+      console.error("Login failed:", err);
+      setErrorMessage("Invalid username or password. Please try again.");
+    }
+  };
 
-    return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
-                <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsernameInput(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded mb-3"
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded mb-3"
-                />
-                {errorMessage && (
-                    <p className="text-red-600 text-center mb-3">{errorMessage}</p>
-                )}
-                <button
-                    onClick={handleLogin}
-                    className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700"
-                >
-                    Login
-                </button>
+  if (!isLoginOpen) return null;
 
-                <div className="flex justify-between mt-4">
-                    <button
-                        className="text-red-600 hover:underline"
-                        onClick={() => {
-                            setIsLoginOpen(false);
-                            navigate("/signup"); // Navigate to signup page
-                        }}
-                    >
-                        Sign Up
-                    </button>
-                    <button
-                        onClick={() => setIsLoginOpen(false)}
-                        className="text-gray-600 hover:underline"
-                    >
-                        Continue as Guest
-                    </button>
-                </div>
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+        <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
 
-                <p className="mt-3 text-center">
-                    <button
-                        onClick={() => {
-                            setIsLoginOpen(false);
-                            navigate("/forgot-password");
-                        }}
-                        className="text-red-600 hover:underline"
-                    >
-                        Forgot Password?
-                    </button>
-                </p>
-            </div>
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsernameInput(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded mb-3"
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded mb-3"
+        />
+
+        {errorMessage && (
+          <p className="text-red-600 text-center mb-3">{errorMessage}</p>
+        )}
+
+        <button
+          onClick={handleLoginClick}
+          className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700"
+        >
+          Login
+        </button>
+
+        <div className="flex justify-between mt-4">
+          <button
+            className="text-red-600 hover:underline"
+            onClick={() => {
+              setIsLoginOpen(false);
+              navigate("/signup");
+            }}
+          >
+            Sign Up
+          </button>
+          <button
+            onClick={() => setIsLoginOpen(false)}
+            className="text-gray-600 hover:underline"
+          >
+            Continue as Guest
+          </button>
         </div>
-    );
+
+        <p className="mt-3 text-center">
+          <a href="/forgot-password" className="text-red-600 hover:underline">
+            Forgot Password?
+          </a>
+        </p>
+      </div>
+    </div>
+  );
 }

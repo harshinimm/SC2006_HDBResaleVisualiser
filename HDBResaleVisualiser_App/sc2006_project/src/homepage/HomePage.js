@@ -23,7 +23,8 @@ export default function HomePage() {
 
     const fetchUserProfile = async () => {
         try {
-            const response = await axiosInstance.get("user-profile/");
+            // Update this URL to match your actual endpoint
+            const response = await axiosInstance.get("/api/account/user-profile/"); 
             const loggedInUsername = response.data.username;
             setUsername(loggedInUsername);
             localStorage.setItem("username", loggedInUsername);
@@ -43,19 +44,19 @@ export default function HomePage() {
 
     return (
         <div className="min-h-screen bg-white text-red-900">
-            <Navbar 
-                isLoggedIn={isLoggedIn} 
-                username={username} 
-                handleLogout={handleLogout} 
-                handleLoginOpen={() => setIsLoginOpen(true)} 
+            <Navbar
+                isLoggedIn={isLoggedIn}
+                username={username}
+                handleLogout={handleLogout}
+                handleLoginOpen={() => setIsLoginOpen(true)}
             />
-            <LoginModal 
-                isLoginOpen={isLoginOpen} 
-                setIsLoginOpen={setIsLoginOpen} 
-                setIsLoggedIn={setIsLoggedIn} 
-                setUsername={setUsername} 
+            <LoginModal
+                isLoginOpen={isLoginOpen}
+                setIsLoginOpen={setIsLoginOpen}
+                setIsLoggedIn={setIsLoggedIn}
+                setUsername={setUsername}
             />
-            
+
             {/* ✅ Search Section, Recent Comparisons, and Navbar go full width */}
             <div className="w-full">
                 <SearchSection search={search} setSearch={setSearch} />

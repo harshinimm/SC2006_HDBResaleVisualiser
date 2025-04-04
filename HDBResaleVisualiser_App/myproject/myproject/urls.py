@@ -20,6 +20,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('account.urls')),
-    path('', lambda request: redirect('http://localhost:3000')),  # Redirect to React app
+    path('api/account/', include('account.urls')),
+    path('api/resale/', include('hdb_resale.urls')),
+    path('', lambda request: redirect('http://localhost:3000')),
 ]

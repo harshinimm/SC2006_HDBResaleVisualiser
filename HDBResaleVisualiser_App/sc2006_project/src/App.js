@@ -6,12 +6,12 @@ import Signup from "./login/Signup";
 import ResetPassword from "./login/ResetPassword";
 import Profile from "./pages/Profile";
 import MapSelection from "./pages/MapSelection";
+import SelectionMode from "./pages/SelectionMode";
 import GoogleMapPage from "./pages/GoogleMapPage";
 import PriceComparison from "./pages/PriceComparison";
 import SearchResults from "./pages/SearchResults";
 import Insights from "./pages/Insights";
-import RecentComparisons from "./homepage/RecentComparisons";
-import HDBResaleVisualizer from "./pages/HDBResaleVisualizer"; 
+import HDBResaleVisualiser from "./pages/HDBResaleVisualiser";
 
 function App() {
     return (
@@ -23,12 +23,13 @@ function App() {
                 <Route path="/reset-password/:token" element={<ResetPassword />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/map-selection" element={<MapSelection />} />
+                <Route path="/selection-mode" element={<SelectionMode />} />  
                 <Route path="/map" element={<GoogleMapPage />} />
                 <Route path="/compare-results" element={<PriceComparison />} />
                 <Route path="/search-results" element={<SearchResults />} />
                 <Route path="/insights" element={<Insights />} />
                 <Route path="/price-comparison" element={<PriceComparison />} />
-                <Route path="/hdb-visualizer" element={<HDBResaleVisualizer />} /> 
+                <Route path="/visualiser/:mode" element={<HDBResaleVisualiser />} /> 
             </Routes>
         </Router>
     );

@@ -17,7 +17,7 @@ export default function ResetPassword() {
             return;
         }
 
-        const apiUrl = "http://127.0.0.1:8000/api/reset-password/";
+        const apiUrl = "http://127.0.0.1:8000/api/account/reset-password/";
 
         try {
             const response = await fetch(apiUrl, {

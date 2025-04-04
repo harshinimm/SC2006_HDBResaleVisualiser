@@ -33,43 +33,54 @@ const MapSelection = () => {
     };
 
     const handleCompare = () => {
-      if (!selectedDistricts.length) {
-          alert("🚨 Please select at least one district before comparing.");
-          return;
-      }
-      if (!startYear || !startMonth || !endYear || !endMonth) {
-          alert("🚨 Please select a valid start and end time.");
-          return;
-      }
-  
-      const startTimeValue = parseInt(`${startYear}${months.indexOf(startMonth) + 1}`);
-      const endTimeValue = parseInt(`${endYear}${months.indexOf(endMonth) + 1}`);
-  
-      if (endTimeValue < startTimeValue) {
-          alert("🚨 End date must be later than the start date.");
-          return;
-      }
-  
-      const comparisonData = {
-          districts: selectedDistricts,
-          startTime: `${startMonth} ${startYear}`,
-          endTime: `${endMonth} ${endYear}`,
-      };
-  
-      // ✅ Save to localStorage (keeping only last 5 comparisons)
-      const existingHistory = JSON.parse(localStorage.getItem("recentComparisons")) || [];
-      const updatedHistory = [comparisonData, ...existingHistory.slice(0, 4)]; // Store max 5
-      localStorage.setItem("recentComparisons", JSON.stringify(updatedHistory));
-  
-      // ✅ Navigate to PriceComparison
-      const params = new URLSearchParams({
-          districts: selectedDistricts.join(","),
-          startTime: comparisonData.startTime,
-          endTime: comparisonData.endTime,
-      });
-  
-      navigate(`/price-comparison?${params.toString()}`);
-  };  
+        if (!selectedDistricts.length) {
+            alert("🚨 Please select at least one district before comparing.");
+            return;
+        }
+        if (!startYear || !startMonth || !endYear || !endMonth) {
+            alert("🚨 Please select a valid start and end time.");
+            return;
+        }
+    
+        const startIndex = months.indexOf(startMonth);
+        const endIndex = months.indexOf(endMonth);
+    
+        const startTimeValue = parseInt(`${startYear}${String(startIndex + 1).padStart(2, "0")}`);
+        const endTimeValue = parseInt(`${endYear}${String(endIndex + 1).padStart(2, "0")}`);
+    
+        if (endTimeValue < startTimeValue) {
+            alert("🚨 End date must be later than the start date.");
+            return;
+        }
+    
+        // Format for API
+        const startFormatted = `${startYear}-${String(startIndex + 1).padStart(2, "0")}`;
+        const endFormatted = `${endYear}-${String(endIndex + 1).padStart(2, "0")}`;
+    
+        // Friendly version for display/localStorage
+        const displayStart = `${startMonth} ${startYear}`;
+        const displayEnd = `${endMonth} ${endYear}`;
+    
+        const comparisonData = {
+            districts: selectedDistricts,
+            startTime: displayStart,
+            endTime: displayEnd,
+        };
+    
+        const existingHistory = JSON.parse(localStorage.getItem("recentComparisons")) || [];
+        const updatedHistory = [comparisonData, ...existingHistory.slice(0, 4)];
+        localStorage.setItem("recentComparisons", JSON.stringify(updatedHistory));
+    
+        const params = new URLSearchParams({
+            districts: selectedDistricts.join(","),
+            startTime: startFormatted,
+            endTime: endFormatted,
+            startMonthUI: displayStart,
+            endMonthUI: displayEnd,
+        });
+    
+        navigate(`/price-comparison?${params.toString()}`);
+    };
   
 
     return (
