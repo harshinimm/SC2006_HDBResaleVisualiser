@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../homepage/Navbar";
 
 const districts = [
-    "Jurong East", "Boon Lay", "Bukit Panjang", "Woodlands", "Yishun",
-    "Bishan", "Orchard", "Serangoon", "Paya Lebar", "Tampines",
-    "Bedok", "Pasir Ris", "Chinatown", "HarbourFront", "Caldecott"
-];
+    "Ang Mo Kio", "Bedok", "Bishan", "Bukit Batok", "Bukit Merah",
+    "Bukit Panjang", "Bukit Timah", "Central Area", "Choa Chu Kang", "Clementi",
+    "Geylang", "Hougang", "Jurong East", "Jurong West", "Kallang/Whampoa",
+    "Marine Parade", "Pasir Ris", "Punggol", "Queenstown", "Sembawang",
+    "Sengkang", "Serangoon", "Tampines", "Toa Payoh", "Woodlands", "Yishun"
+  ];
 
 const years = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i); // Last 10 years
 const months = [

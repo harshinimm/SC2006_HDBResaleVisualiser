@@ -1,197 +1,224 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import axios from "axios";
 import Navbar from "../homepage/Navbar";
+import ReactSlider from "react-slider";
 
-const mockData = [
-    { id: 1, district: "Woodlands", year: 1995, month: "June", price: 250000, flatType: "4-Room", details: "Lease 99 years, 95 sqm" },
-    { id: 2, district: "Woodlands", year: 2000, month: "March", price: 320000, flatType: "5-Room", details: "Lease 99 years, 110 sqm" },
-    { id: 3, district: "Bishan", year: 2010, month: "August", price: 450000, flatType: "Executive", details: "Lease 99 years, 130 sqm" },
-    { id: 4, district: "Bishan", year: 2018, month: "July", price: 520000, flatType: "5-Room", details: "Lease 99 years, 120 sqm" },
+const API_URL = "http://127.0.0.1:8000/api/resale/raw_data_by_town/";
+
+const townOptions = [
+    "Ang Mo Kio", "Bedok", "Bishan", "Bukit Batok", "Bukit Merah",
+    "Bukit Panjang", "Bukit Timah", "Central Area", "Choa Chu Kang", "Clementi",
+    "Geylang", "Hougang", "Jurong East", "Jurong West", "Kallang/Whampoa",
+    "Marine Parade", "Pasir Ris", "Punggol", "Queenstown", "Sembawang",
+    "Sengkang", "Serangoon", "Tampines", "Toa Payoh", "Woodlands", "Yishun"
+];
+const roomTypeOptions = [
+    "1 Room", "2 Room", "3 Room", "4 Room", "5 Room", "Executive", "Multi-Generation"
 ];
 
 const SearchResults = () => {
     const location = useLocation();
-    const navigate = useNavigate();
-    const searchParams = new URLSearchParams(location.search);
-    
-    // Get search parameters from URL
-    const initialDistrict = searchParams.get("district") || "";
-    const initialStartYear = searchParams.get("startYear") || "";
-    const initialEndYear = searchParams.get("endYear") || "";
 
-    const [district, setDistrict] = useState(initialDistrict);
-    const [startYear, setStartYear] = useState(initialStartYear);
-    const [endYear, setEndYear] = useState(initialEndYear);
-    const [sortOrder, setSortOrder] = useState("asc");
+    const [district, setDistrict] = useState("");
+    const [roomType, setRoomType] = useState("");
     const [filteredResults, setFilteredResults] = useState([]);
-    const [selectedListing, setSelectedListing] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [yearRange, setYearRange] = useState([2017, 2025]);
+
+    const [sortConfig, setSortConfig] = useState({
+        field: "resale_price",
+        direction: "asc",
+    });
+
+    const fetchData = (district, roomType) => {
+        if (!district) return;
+
+        setLoading(true);
+
+        const params = new URLSearchParams({ town: district.toUpperCase() });
+        if (roomType) params.set("room_type", roomType.toUpperCase());
+
+        axios
+            .get(`${API_URL}?${params.toString()}`)
+            .then((res) => {
+                let results = res.data;
+
+                // Sorting
+                results.sort((a, b) => {
+                    const { field, direction } = sortConfig;
+                    let valA = a[field];
+                    let valB = b[field];
+
+                    if (field === "month") {
+                        valA = new Date(valA);
+                        valB = new Date(valB);
+                    }
+
+                    if (typeof valA === "string") {
+                        return direction === "asc"
+                            ? valA.localeCompare(valB)
+                            : valB.localeCompare(valA);
+                    }
+
+                    return direction === "asc" ? valA - valB : valB - valA;
+                });
+
+                setFilteredResults(results);
+            })
+            .catch((err) => {
+                console.error("❌ Error fetching data:", err);
+                setFilteredResults([]);
+            })
+            .finally(() => setLoading(false));
+    };
 
     useEffect(() => {
-        filterResults();
-    }, []);
+        const params = new URLSearchParams(location.search);
+        const districtParam = params.get("district");
+        const roomTypeParam = params.get("roomType") || "";
 
-    const filterResults = () => {
-        let results = mockData.filter((item) => 
-            (!district || item.district.toLowerCase().includes(district.toLowerCase())) &&
-            (!startYear || item.year >= parseInt(startYear)) &&
-            (!endYear || item.year <= parseInt(endYear))
-        );
+        setDistrict(districtParam || "");
+        setRoomType(roomTypeParam);
 
-        if (sortOrder === "asc") {
-            results.sort((a, b) => a.price - b.price);
-        } else {
-            results.sort((a, b) => b.price - a.price);
+        if (districtParam) {
+            fetchData(districtParam, roomTypeParam);
         }
+    }, [location.search, sortConfig]);
 
-        setFilteredResults(results);
+    const handleSort = (field) => {
+        setSortConfig((prev) => ({
+            field,
+            direction: prev.field === field && prev.direction === "asc" ? "desc" : "asc",
+        }));
     };
 
-    const handleFilter = () => {
-        filterResults();
-    };
-
-    const handleKeyPress = (e) => {
-        if (e.key === "Enter") {
-            filterResults();
-        }
+    const getSortSymbol = (field) => {
+        if (sortConfig.field !== field) return "";
+        return sortConfig.direction === "asc" ? " ↑" : " ↓";
     };
 
     return (
         <div className="min-h-screen bg-gray-100 text-red-900">
             <Navbar />
-
-            <div className="max-w-5xl mx-auto mt-10 px-6">
+            <div className="max-w-6xl mx-auto mt-10 px-6">
                 <h1 className="text-4xl font-bold text-center mb-10">🏠 HDB Past Listings</h1>
 
-                {/* Filter Controls */}
                 <div className="bg-white p-6 shadow-md rounded-lg mb-10">
-                    <h2 className="text-xl font-semibold mb-3">🔎 Filter Listings</h2>
-                    <div className="flex flex-wrap gap-4 items-center">
-                        {/* District Filter */}
-                        <input
-                            type="text"
+                    <h2 className="text-xl font-semibold mb-4">🔎 Filter Listings</h2>
+
+                    {/* Filter Bar */}
+                    <div className="flex flex-wrap md:flex-nowrap gap-4 items-center">
+                        {/* District Dropdown */}
+                        <select
                             value={district}
                             onChange={(e) => setDistrict(e.target.value)}
-                            placeholder="Search by District"
-                            className="border px-4 py-2 rounded-lg w-64"
-                            onKeyPress={handleKeyPress}
-                        />
-
-                        {/* Start Year Filter */}
-                        <input
-                            type="number"
-                            value={startYear}
-                            onChange={(e) => setStartYear(e.target.value)}
-                            placeholder="Start Year"
-                            className="border px-4 py-2 rounded-lg w-32"
-                            onKeyPress={handleKeyPress}
-                        />
-
-                        {/* End Year Filter */}
-                        <input
-                            type="number"
-                            value={endYear}
-                            onChange={(e) => setEndYear(e.target.value)}
-                            placeholder="End Year"
-                            className="border px-4 py-2 rounded-lg w-32"
-                            onKeyPress={handleKeyPress}
-                        />
-
-                        {/* Sort by Price */}
-                        <select
-                            value={sortOrder}
-                            onChange={(e) => setSortOrder(e.target.value)}
-                            className="border px-4 py-2 rounded-lg"
+                            className="border px-4 py-2 rounded-lg w-full md:w-48"
                         >
-                            <option value="asc">Sort by Price: Low to High</option>
-                            <option value="desc">Sort by Price: High to Low</option>
+                            <option value="">Select District</option>
+                            {townOptions.map((town) => (
+                                <option key={town} value={town}>{town}</option>
+                            ))}
                         </select>
 
-                        {/* 🔹 Apply Filter Button */}
-                        <button
-                            onClick={handleFilter}
-                            className="px-6 py-2 bg-red-600 text-white font-bold rounded-lg shadow-lg hover:bg-red-700 transition-all"
+                        {/* Room Type Dropdown */}
+                        <select
+                            value={roomType}
+                            onChange={(e) => setRoomType(e.target.value)}
+                            className="border px-4 py-2 rounded-lg w-full md:w-48"
                         >
-                            ✅ Apply Filter
+                            <option value="">Select Room Type</option>
+                            {roomTypeOptions.map((type) => (
+                                <option key={type} value={type}>{type}</option>
+                            ))}
+                        </select>
+
+                        {/* Search Button */}
+                        <button
+                            onClick={() => fetchData(district, roomType)}
+                            className="px-4 py-2 bg-red-600 text-white font-bold rounded-lg shadow-md hover:bg-red-700 transition-all w-full md:w-auto"
+                        >
+                            Search
                         </button>
+
+                        {/* Year Slider (right aligned) */}
+                        <div className="flex flex-col md:flex-row md:items-center w-full md:w-auto ml-auto">
+                            <label className="font-semibold text-sm mb-1 md:mb-0 md:mr-2 whitespace-nowrap">
+                                📅 Select Year Range:
+                            </label>
+
+                            <span className="text-sm mr-2">{yearRange[0]}</span>
+
+                            <ReactSlider
+                                className="w-full md:w-48 h-6"
+                                thumbClassName="h-4 w-4 bg-red-600 rounded-full cursor-pointer top-1.5"
+                                trackClassName="top-2 bottom-2 bg-red-300"
+                                min={2017}
+                                max={2025}
+                                value={yearRange}
+                                onChange={(newRange) => setYearRange(newRange)}
+                                pearling
+                                minDistance={1}
+                            />
+
+                            <span className="text-sm ml-2">{yearRange[1]}</span>
+                        </div>
                     </div>
                 </div>
 
-                {/* Display Results */}
-                {filteredResults.length > 0 ? (
-                    <div className="bg-white p-6 shadow-md rounded-lg">
-                        <h2 className="text-xl font-semibold mb-4">📋 Search Results</h2>
-                        <table className="w-full border-collapse border border-gray-300">
-                            <thead>
-                                <tr className="bg-red-600 text-white">
-                                    <th className="border px-6 py-3">District</th>
-                                    <th className="border px-6 py-3">Year</th>
-                                    <th className="border px-6 py-3">Month</th>
-                                    <th className="border px-6 py-3">Flat Type</th>
-                                    <th className="border px-6 py-3">Price</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredResults.map((item) => (
-                                    <tr 
-                                        key={item.id} 
-                                        className="border bg-gray-50 hover:bg-gray-200 transition cursor-pointer"
-                                        onClick={() => setSelectedListing(item)} // ✅ Open modal on click
-                                    >
-                                        <td className="border px-6 py-3 text-center">{item.district}</td>
-                                        <td className="border px-6 py-3 text-center">{item.year}</td>
-                                        <td className="border px-6 py-3 text-center">{item.month}</td>
-                                        <td className="border px-6 py-3 text-center">{item.flatType}</td>
-                                        <td className="border px-6 py-3 text-center">${item.price.toLocaleString()}</td>
+                {/* Results */}
+                {loading && <p className="text-center text-xl font-semibold">Loading results...</p>}
+                {!loading && filteredResults.length === 0 && (
+                    <p className="text-center">No listings found.</p>
+                )}
+                {!loading && filteredResults.length > 0 && (
+                    <table className="table-auto w-full bg-white rounded-lg shadow-md overflow-hidden">
+                        <thead className="bg-red-200">
+                            <tr>
+                                <th onClick={() => handleSort("month")} className="cursor-pointer px-4 py-3">
+                                    Month{getSortSymbol("month")}
+                                </th>
+                                <th onClick={() => handleSort("block")} className="cursor-pointer px-4 py-3">
+                                    Block{getSortSymbol("block")}
+                                </th>
+                                <th onClick={() => handleSort("street_name")} className="cursor-pointer px-4 py-3">
+                                    Street Name{getSortSymbol("street_name")}
+                                </th>
+                                <th onClick={() => handleSort("flat_type")} className="cursor-pointer px-4 py-3">
+                                    Room Type{getSortSymbol("flat_type")}
+                                </th>
+                                <th onClick={() => handleSort("floor_area_sqm")} className="cursor-pointer px-4 py-3">
+                                    Floor Area (sqm){getSortSymbol("floor_area_sqm")}
+                                </th>
+                                <th onClick={() => handleSort("lease_commence_date")} className="cursor-pointer px-4 py-3">
+                                    Start of Lease{getSortSymbol("lease_commence_date")}
+                                </th>
+                                <th onClick={() => handleSort("resale_price")} className="cursor-pointer px-4 py-3">
+                                    Resale Price{getSortSymbol("resale_price")}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredResults
+                                .filter((item) => {
+                                    const year = new Date(item.month).getFullYear();
+                                    return year >= yearRange[0] && year <= yearRange[1];
+                                })
+                                .map((item, idx) => (
+                                    <tr key={idx} className="text-center border-b hover:bg-gray-100">
+                                        <td className="px-4 py-2">{item.month}</td>
+                                        <td className="px-4 py-2">{item.block}</td>
+                                        <td className="px-4 py-2">{item.street_name}</td>
+                                        <td className="px-4 py-2">{item.flat_type}</td>
+                                        <td className="px-4 py-2">{item.floor_area_sqm}</td>
+                                        <td className="px-4 py-2">{item.lease_commence_date}</td>
+                                        <td className="px-4 py-2">${item.resale_price.toLocaleString()}</td>
                                     </tr>
                                 ))}
-                            </tbody>
-                        </table>
-                    </div>
-                ) : (
-                    <div className="bg-white p-6 shadow-md rounded-lg text-center text-red-600 font-semibold">
-                        ❌ No records found for this search.
-                    </div>
+                        </tbody>
+                    </table>
                 )}
-
-                {/* Back to Homepage */}
-                <div className="text-center mt-6">
-                    <button
-                        onClick={() => navigate("/")}
-                        className="px-6 py-3 bg-red-600 text-white font-bold rounded-lg shadow-lg hover:bg-red-700 transition-all"
-                    >
-                        ⬅ Back to Homepage
-                    </button>
-                </div>
             </div>
-
-            {/* Modal for Listing Details */}
-            {selectedListing && (
-                <div 
-                    className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
-                    onClick={() => setSelectedListing(null)}
-                >
-                    <div 
-                        className="bg-white p-6 rounded-lg shadow-lg w-96"
-                        onClick={(e) => e.stopPropagation()} 
-                    >
-                        <h2 className="text-2xl font-bold mb-4">🏠 Listing Details</h2>
-                        <p><strong>District:</strong> {selectedListing.district}</p>
-                        <p><strong>Year:</strong> {selectedListing.year}</p>
-                        <p><strong>Month:</strong> {selectedListing.month}</p>
-                        <p><strong>Flat Type:</strong> {selectedListing.flatType}</p>
-                        <p><strong>Price:</strong> ${selectedListing.price.toLocaleString()}</p>
-                        <p><strong>Details:</strong> {selectedListing.details}</p>
-
-                        <button 
-                            onClick={() => setSelectedListing(null)} 
-                            className="mt-4 px-4 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition"
-                        >
-                            ❌ Close
-                        </button>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

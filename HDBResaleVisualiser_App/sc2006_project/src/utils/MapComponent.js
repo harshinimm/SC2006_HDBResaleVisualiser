@@ -165,7 +165,7 @@ const MapComponent = () => {
     }
     navigate("/visualiser/single", {
       state: {
-        selectedDistricts,
+        selectedDistrict,
         selectedRoomTypes,
         type: "single-district"
       }

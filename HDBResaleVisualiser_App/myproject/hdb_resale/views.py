@@ -156,3 +156,81 @@ def comparison_graph(request):
 
     # Return as JSON
     return Response(grouped.to_dict(orient='records'), status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def resale_roomtype_trends(request):
+    print("🔍 API HIT: resale_roomtype_trends🔥🔥🔥")
+    town = request.GET.get('town')
+    start_year = request.GET.get('start_year')
+    end_year = request.GET.get('end_year')
+    if not town:
+        return Response({'error': 'Missing town parameter.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Filter for the selected town
+    filtered_df = df[df['town'] == town.upper()]
+
+    # Filter by year range if provided
+    if start_year and end_year:
+        filtered_df = filtered_df[
+            (filtered_df['year'] >= int(start_year)) & 
+            (filtered_df['year'] <= int(end_year))
+        ]
+    print("📊 Filtered Data Preview:")
+    print(filtered_df.head())
+
+    if filtered_df.empty:
+        return Response([], status=status.HTTP_200_OK)
+    
+
+    # Group by year and room type, get average resale price
+    result = (
+        filtered_df.groupby(['year', 'flat_type'])['resale_price']
+        .mean()
+        .reset_index()
+        .rename(columns={'resale_price': 'avg_price'})
+        .sort_values(['year', 'flat_type'])
+    )
+
+    print("📈 Grouped Average Prices by Room Type:")
+    for flat_type in result['flat_type'].unique():
+        print(f"\n🏠 {flat_type}")
+        flat_group = result[result['flat_type'] == flat_type]
+        for _, row in flat_group.iterrows():
+            print(f"  Year {int(row['year'])}: ${int(row['avg_price']):,}")
+
+    return Response(result.to_dict(orient='records'), status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def raw_data_by_town(request):
+    town = request.GET.get('town')
+    room_type = request.GET.get('room_type')
+
+    print("🚨 API Endpoint Hit: /api/resale/raw_data_by_town")
+    print(f"📥 Received parameters: town={town}, room_type={room_type}")
+
+    if not town:
+        print("❌ Missing required parameter: town.")
+        return Response({'error': 'Missing required parameter (town).'}, status=status.HTTP_400_BAD_REQUEST)
+
+    start_date = pd.to_datetime('2017-01')
+    end_date = pd.to_datetime('2025-12')
+
+    filtered_df = df[
+        (df['town'] == town.upper()) &
+        (df['month'] >= start_date) &
+        (df['month'] <= end_date)
+    ]
+
+    if room_type:
+        filtered_df = filtered_df[filtered_df['flat_type'].str.upper() == room_type.upper()]
+
+    print(f"🔎 Filtered {len(filtered_df)} records for town={town.upper()}, room_type={room_type or 'Any'}")
+    print(filtered_df[["month", "block", "street_name", "flat_type", "resale_price"]].head())
+
+    if filtered_df.empty:
+        print("⚠️ No matching records found.")
+        return Response([], status=status.HTTP_200_OK)
+    
+    filtered_df['month'] = filtered_df['month'].dt.strftime('%Y-%m')
+
+    return Response(filtered_df.to_dict(orient='records'), status=status.HTTP_200_OK)
