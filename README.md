@@ -30,6 +30,8 @@ Built with React, the UI ensures modularity, responsiveness, and ease of interac
 
 Backend:
 The CSV dataset acts as a pseudo-database, parsed and filtered in real time using JavaScript logic to serve relevant chart data.
+Django REST Framework used to develop and connect backend API to support frontend functionalities such as retrieving data from CSV and adding User data.
+SQlite.3 database utilised to store User data, with encryption on User password to improve security.
 
 Chart Rendering:
 Utilizes libraries such as Chart.js or Recharts to render responsive and animated visualizations.
